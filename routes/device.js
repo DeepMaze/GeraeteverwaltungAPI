@@ -8,7 +8,7 @@ var mysqlConfig = require('../environment/mysql');
 
 var router = express.Router();
 
-router.post('/*', checkToken);
+router.use('/*', checkToken);
 
 router.post('/newDevice', async (req, res, next) => {
     var query = 'INSERT INTO devices (Label, DescriptiveInformation, SerialNumber, Manufacturer, Model, RentStart, ExpectedReturn, LocationID, PersonID)' +
@@ -21,11 +21,36 @@ router.post('/newDevice', async (req, res, next) => {
         connection.end();
     } catch (err) {
         console.error(err);
-        res.send({ error: 'Something didn´t work'});
+        res.send({ error: 'Something didn´t work' });
         res.end();
     }
     res.status(204)
     res.send();
+});
+
+router.get('/deviceList', async (req, res, next) => {
+    var query = 'SELECT * FROM devices';
+    try {
+        var connection = await mysql.createConnection(mysqlConfig);
+        var [rows, fields] = await connection.execute(query);
+    } catch (err) {
+        console.error(err);
+        res.send({ error: err });
+    }
+    res.send(rows);
+});
+
+router.get('/device', async (req, res, next) => {
+    if (!req.query) req.send({ error: 'Missing deviceID' })
+    var query = `SELECT * FROM devices WHERE ${req.query['deviceID']}`;
+    try {
+        var connection = await mysql.createConnection(mysqlConfig);
+        var [rows, fields] = await connection.execute(query);
+    } catch (err) {
+        if (generalConfig.debug) { console.error(err); }
+        res.send({ error: err });
+    }
+    res.send(rows);
 });
 
 module.exports = router;

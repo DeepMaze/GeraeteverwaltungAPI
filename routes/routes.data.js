@@ -1,9 +1,8 @@
 const routes = [
-    { path: '/read', file: require('./read') },
-    // { path: '/write', file: require('./write') },
-    // { path: '/delete', file: require('./delete') },
-    // { path: '/create', file: require('./create') },
-    // { path: '/login', file: require('./login') },
+    { path: '/device', file: require('./device') },
+    { path: '/location', file: require('./location') },
+    { path: '/person', file: require('./person') },
+    { path: '/user', file: require('./user') },
 ]
 
 module.exports = routes;
