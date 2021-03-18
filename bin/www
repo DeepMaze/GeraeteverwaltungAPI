@@ -2,11 +2,16 @@
 
 var app = require('../app');
 var http = require('http');
-var normalizePort = require('../helperFunctions/normalizePort');
-var onError = require('../helperFunctions/onError');
-var onListening = require('../helperFunctions/onListening');
 
-var port = normalizePort(process.env.PORT || '3000');
+var normalizePort = require('../helpers/normalizePort');
+var onError = require('../helpers/onError');
+var onListening = require('../helpers/onListening');
+
+var generalConfig = require('../environment/general');
+
+
+
+var port = normalizePort(generalConfig.port);
 app.set('port', port);
 
 var server = http.createServer(app);
