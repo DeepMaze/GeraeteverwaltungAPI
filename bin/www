@@ -17,7 +17,9 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-handleOldLogs();
+setInterval(() => {
+    handleOldLogs();
+}, 1000 * 60 * 60 * generalConfig.clearOldLogsInterval);
 
 server.listen(port);
 if (generalConfig.log) { createLog({ type: 'serverStart', params: { port } }); }

@@ -16,24 +16,30 @@ const createLog = async (data) => {
     var currDate = new Date(Date.now());
     var pathDate = `${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate()}`;
     var filePath = `${globalConfig.logPath}/${data.type}/${pathDate}.txt`;
-
-    var err = await access(filePath, constants.F_OK | constants.W_OK);
-    if (err) {
+    try {
+        var err = await access(filePath, constants.F_OK | constants.W_OK);
+        if (err) {
+            if (globalConfig.debug) { console.log(err); }
+            return;
+        }
+        var message = `${currDate.getHours}:${currDate.getMinutes}:${currDate.getSeconds}.${currDate.getMilliseconds}\t${messages[data.status](data.parmas)}`;
+        var err = await writeFile(filePath, message);
+        if (err) {
+            if (globalConfig.debug) { console.log(err); }
+            return;
+        }
+    } catch (err) {
         if (globalConfig.debug) { console.log(err); }
-        return;
-    }
-    var message = `${currDate.getHours}:${currDate.getMinutes}:${currDate.getSeconds}.${currDate.getMilliseconds}\t${messages[data.status](data.parmas)}`;
-    var err = await writeFile(filePath, message);
-    if (err) {
-        if (globalConfig.debug) { console.log(err); }
-        return;
     }
 };
 
 const handleOldLogs = async () => {
     try {
         var err = await access(globalConfig.logPath, constants.F_OK | constants.W_OK);
-        if (err) { return; }
+        if (err) {
+            if (globalConfig.debug) { console.log(err); }
+            return;
+        }
         var filesToDelete = [];
         var folderContent = await readdir(globalConfig.logPath);
         for (var folder of folderContent) {
