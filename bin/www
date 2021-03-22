@@ -3,9 +3,9 @@
 var app = require('../app');
 var http = require('http');
 
-var normalizePort = require('../helpers/normalizePort');
-var { onError, onListening } = require('../helpers/serverEvents');
-var { createLog, handleOldLogs } = require('../helpers/logging');
+var normalizePort = require('../helper/normalizePort');
+var { onError, onListening } = require('../helper/serverEvents');
+var { createLog, handleOldLogs } = require('../helper/logging');
 
 var { generalConfig } = require('../environment/config');
 

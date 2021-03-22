@@ -5,7 +5,7 @@ var logger = require('morgan');
 
 var { createLog } = require('./helper/logging');
 var { generalConfig } = require('./environment/config');
-var routes = require('./enviroment/routes');
+var routes = require('./environment/routes');
 
 
 
