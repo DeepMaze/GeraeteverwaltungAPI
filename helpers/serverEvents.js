@@ -1,3 +1,15 @@
+var debug = require('debug')('geraeteverwaltungapi:server');
+
+
+
+const onListening = (server) => {
+    var addr = (server) ? server.address() : '';
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}
+
 const onError = (error) => {
     if (error.syscall !== 'listen') {
         throw error;
@@ -19,4 +31,4 @@ const onError = (error) => {
     }
 }
 
-module.exports = onError;
+module.exports = { onListening, onError };

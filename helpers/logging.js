@@ -1,16 +1,10 @@
 var { constants } = require('fs');
 var { access, writeFile, readdir, stat, rm } = require('fs/promises');
-var globalConfig = require('../environment/general');
+
+var { globalConfig } = require('../environment/config');
+var { logMessage } = require('../environment/messages');
 
 
-
-const messages = {
-    serverStart: (params) => { return { type: 'info', msg: `Server started, listening on ${params.port}` }; },
-    routeSetup: (params) => { return { type: 'info', msg: `Route '${params.path}' setup. The route executes file '${params.file}'` }; },
-    tokenCreated: (params) => { return { type: 'info', msg: `Created Token for user '${params.userID}' on IP-Address '${params.ip}'` }; },
-    tokenChecked: (params) => { return { type: 'info', msg: `Token check for user '${params.userID}' on IP-Address '${params.ip}' ${(params.result) ? ('succeded') : ('failed')}` }; },
-    loginChecked: (params) => { return { type: 'info', msg: `IP-Address ${params.ip} ${(params.result) ? ('logged in') : ('failed to login')} with user '${params.userID}'` }; },
-};
 
 const createLog = async (data) => {
     var currDate = new Date(Date.now());
@@ -22,7 +16,7 @@ const createLog = async (data) => {
             if (globalConfig.debug) { console.log(err); }
             return;
         }
-        var message = `${currDate.getHours}:${currDate.getMinutes}:${currDate.getSeconds}.${currDate.getMilliseconds}\t${messages[data.status](data.parmas)}`;
+        var message = `${currDate.getHours}:${currDate.getMinutes}:${currDate.getSeconds}.${currDate.getMilliseconds}\t${logMessage[data.status](data.parmas)}`;
         var err = await writeFile(filePath, message);
         if (err) {
             if (globalConfig.debug) { console.log(err); }

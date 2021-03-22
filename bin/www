@@ -4,11 +4,10 @@ var app = require('../app');
 var http = require('http');
 
 var normalizePort = require('../helpers/normalizePort');
-var onError = require('../helpers/onError');
-var onListening = require('../helpers/onListening');
+var { onError, onListening } = require('../helpers/serverEvents');
 var { createLog, handleOldLogs } = require('../helpers/logging');
 
-var generalConfig = require('../environment/general');
+var { generalConfig } = require('../environment/config');
 
 
 

@@ -4,10 +4,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var { createLog } = require('./helpers/logging');
-
-var generalConfig = require('./environment/general');
-
-var routes = require('./routes/routes.data');
+var { generalConfig } = require('./environment/config');
+var routes = require('./enviroment/routes');
 
 
 

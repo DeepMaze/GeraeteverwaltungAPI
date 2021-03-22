@@ -1,6 +1,6 @@
 var bcrypt = require('bcrypt');
 
-var encryptionConfig = require('../environment/encryption');
+var { encryptionConfig } = require('../environment/config');
 
 
 
@@ -9,6 +9,5 @@ var encrypt = (data) => {
         .then((hash) => { return hash; })
         .catch((error) => { console.log(error) });
 }
-
 
 module.exports = encrypt;

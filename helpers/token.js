@@ -1,16 +1,21 @@
 var jwt = require('jsonwebtoken');
 
-var { createLog } = require('../helpers/logging');
+var { createLog } = require('./logging');
 
-var generalConfig = require('../environment/general');
-var jwtConfig = require('../environment/jsonwebtoken');
-
+var { generalConfig, tokenConfig } = require('../environment/config');
 
 
-const checkToken = (token, userID, ip) => {
+
+const createToken = (userID, ip) => {
+	var token = jwt.sign({ userID }, tokenConfig.privateKey, { algorithm: 'RS256', expiresIn: tokenConfig.expireIn });
+	if (generalConfig.log) { createLog({ type: 'tokenCreated', params: { userID, ip } }); }
+	return token;
+};
+
+const verifyToken = (token, userID, ip) => {
 	if (!token || !userID) { return 0 };
 	try {
-		var decoded = jwt.verify(token, jwtConfig.privateKey);
+		var decoded = jwt.verify(token, tokenConfig.privateKey);
 	} catch (err) {
 		if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip } }); }
 		res.send({ error: 'JSON Web Token could not be verified.' })
@@ -19,8 +24,8 @@ const checkToken = (token, userID, ip) => {
 	return 1;
 };
 
-const checkToken_MiddlewareFunction = (req, res, next) => {
-	var tokenVerify = checkToken(req.token, req.userID, req.socket.remoteAddress);
+const checkToken = (req, res, next) => {
+	var tokenVerify = verifyToken(req.token, req.userID, req.socket.remoteAddress);
 	switch (tokenVerify) {
 		case -1: {
 			if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
@@ -40,4 +45,4 @@ const checkToken_MiddlewareFunction = (req, res, next) => {
 	}
 }
 
-module.exports = checkToken_MiddlewareFunction;
+module.exports = { createToken, checkToken };

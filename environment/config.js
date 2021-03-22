@@ -1,4 +1,25 @@
-var config = {
+var generalConfig = {
+    port: 3000,
+    environment: 'dev',
+    get debug() { return (generalConfig.environment == "dev") ? (true) : (false) },
+    get log() { return (generalConfig.environment == "prod") ? (true) : (false) },
+    logPath: './log/',
+    logMaxAge: 7,
+    clearOldLogsInterval: 24,
+};
+
+var mysqlConfig = {
+    host: "localhost",
+    user: "service",
+    password: "service",
+    database: 'devicemanagement'
+};
+
+const encryptionConfig = {
+    saltRounds: 10,
+}
+
+var tokenConfig = {
     privateKey: 'MIICWwIBAAKBgG8K2qPhCVRw08f5soLD0mEgOPwStYncTvEqdVJq65qUvQ9sVZAf' +
         'JMxK9W4XUsoBjE24xL77WGEFuAEIdjwL9n3646lPjRQx18I5ETvHsKl7VBGSZH2A' +
         'cn9mHd5zFce8PXIwACd8uygKRLd0+4Zpksz6sNVmoE7Icv0fTxQUr2K/AgMBAAEC' +
@@ -19,4 +40,4 @@ var config = {
     expireIn: 60 * 60 * 24
 };
 
-module.exports = config;
+module.exports = { generalConfig, mysqlConfig, encryptionConfig, tokenConfig };

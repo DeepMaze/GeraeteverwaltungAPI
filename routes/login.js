@@ -3,18 +3,13 @@ var mysql = require('mysql2/promise');
 var bcrypt = require('bcrypt');
 
 var { createLog } = require('../helpers/logging');
-var checkToken = require('../helpers/checkToken');
-var createToken = require('../helpers/createToken');
-
-var generalConfig = require('./environment/general');
-var mysqlConfig = require('../environment/mysql');
+var { createToken } = require('../helpers/token');
+var { generalConfig, mysqlConfig } = require('../environment/config');
 var messages = require('../environment/messages');
 
 
 
 var router = express.Router();
-
-router.use('/*', checkToken);
 
 router.get('/checkLogin', async (req, res, next) => {
     var query = `SELECT Password FROM users WHERE UserID = ${mysql.escape(req.query['userID'])}`;
