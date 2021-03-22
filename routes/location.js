@@ -1,8 +1,8 @@
 var express = require('express');
 var mysql = require('mysql2/promise');
 
-var { checkToken } = require('../helpers/token');
-var buildUpdateSetString = require('../helpers/buildUpdateSetString');
+var { checkToken } = require('../helper/token');
+var buildUpdateSetString = require('../helper/buildUpdateSetString');
 var { mysqlConfig } = require('../environment/config');
 var errorMsg = require('../environment/messages');
 

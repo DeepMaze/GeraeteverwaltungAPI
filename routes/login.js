@@ -2,8 +2,8 @@ var express = require('express');
 var mysql = require('mysql2/promise');
 var bcrypt = require('bcrypt');
 
-var { createLog } = require('../helpers/logging');
-var { createToken } = require('../helpers/token');
+var { createLog } = require('../helper/logging');
+var { createToken } = require('../helper/token');
 var { generalConfig, mysqlConfig } = require('../environment/config');
 var messages = require('../environment/messages');
 
