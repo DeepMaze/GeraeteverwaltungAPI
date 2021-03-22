@@ -3,7 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var { createLog } = require('../helpers/logging');
+var { createLog } = require('./helpers/logging');
 
 var generalConfig = require('./environment/general');
 

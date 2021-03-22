@@ -4,7 +4,7 @@ var mysql = require('mysql2/promise');
 var checkToken = require('../helpers/checkToken');
 var buildUpdateSetString = require('../helpers/buildUpdateSetString');
 var mysqlConfig = require('../environment/mysql');
-var errorMsg = require('../environment/errorMessages');
+var errorMsg = require('../environment/messages');
 
 
 
@@ -19,6 +19,7 @@ router.get('/getLocationList', async (req, res, next) => {
 		var [rows] = await connection.execute(query);
 		connection.end();
 	} catch (err) {
+		if (generalConfig.debug) { console.error(err); }
 		res.status(500).send({ error: errorMsg.dbConnectionFailure });
 	}
 	res.status(200).send(rows);
@@ -32,6 +33,7 @@ router.get('/getLocation', async (req, res, next) => {
 		var [rows] = await connection.execute(query);
 		connection.end();
 	} catch (err) {
+		if (generalConfig.debug) { console.error(err); }
 		res.status(500).send({ error: errorMsg.dbConnectionFailure });
 	}
 	res.status(200).send(rows);
@@ -45,6 +47,7 @@ router.post('/createLocation', async (req, res, next) => {
 		await connection.execute(query);
 		connection.end();
 	} catch (err) {
+		if (generalConfig.debug) { console.error(err); }
 		res.status(500).send({ error: errorMsg.dbConnectionFailure });
 	}
 	res.status(204).send();
@@ -57,6 +60,7 @@ router.put('/updateLocation', async (req, res, next) => {
 		await connection.execute(query);
 		connection.end();
 	} catch (err) {
+		if (generalConfig.debug) { console.error(err); }
 		res.status(500).send({ error: errorMsg.dbConnectionFailure });
 	}
 	res.status(204).send();
@@ -69,6 +73,7 @@ router.put('/deleteLocation', async (req, res, next) => {
 		await connection.execute(query);
 		connection.end();
 	} catch (err) {
+		if (generalConfig.debug) { console.error(err); }
 		res.status(500).send({ error: errorMsg.dbConnectionFailure });
 	}
 	res.status(204).send();

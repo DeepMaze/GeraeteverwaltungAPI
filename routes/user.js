@@ -4,7 +4,7 @@ var mysql = require('mysql2/promise');
 var checkToken = require('../helpers/checkToken');
 var buildUpdateSetString = require('../helpers/buildUpdateSetString');
 var mysqlConfig = require('../environment/mysql');
-var errorMsg = require('../environment/errorMessages');
+var errorMsg = require('../environment/messages');
 
 
 

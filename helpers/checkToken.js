@@ -2,7 +2,7 @@ var jwt = require('jsonwebtoken');
 
 var { createLog } = require('../helpers/logging');
 
-var generalConfig = require('./environment/general');
+var generalConfig = require('../environment/general');
 var jwtConfig = require('../environment/jsonwebtoken');
 
 
