@@ -6,17 +6,17 @@ var { logMessage } = require('../environment/messages');
 
 
 
-const createLog = async (data) => {
+const createLog = async (type, status, params) => {
     var currDate = new Date(Date.now());
     var pathDate = `${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate()}`;
-    var filePath = `${globalConfig.logPath}/${data.type}/${pathDate}.txt`;
+    var filePath = `${globalConfig.logPath}/${type}/${pathDate}.txt`;
     try {
         var err = await access(filePath, constants.F_OK | constants.W_OK);
         if (err) {
             if (globalConfig.debug) { console.log(err); }
             return;
         }
-        var message = `${currDate.getHours}:${currDate.getMinutes}:${currDate.getSeconds}.${currDate.getMilliseconds}\t${logMessage[data.status](data.parmas)}`;
+        var message = `${currDate.getHours}:${currDate.getMinutes}:${currDate.getSeconds}.${currDate.getMilliseconds}\t${logMessage[status](params)}`;
         var err = await writeFile(filePath, message);
         if (err) {
             if (globalConfig.debug) { console.log(err); }

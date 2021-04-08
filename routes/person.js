@@ -1,7 +1,7 @@
 var express = require('express');
 var mysql = require('mysql2/promise');
 
-var { checkToken } = require('../helper/token');
+var { checkTokenMIDWARE } = require('../helper/token');
 var buildUpdateSetString = require('../helper/buildUpdateSetString');
 var { mysqlConfig } = require('../environment/config');
 var errorMsg = require('../environment/messages');
@@ -10,7 +10,7 @@ var errorMsg = require('../environment/messages');
 
 var router = express.Router();
 
-router.use('/*', checkToken);
+router.use('/*', checkTokenMIDWARE);
 
 router.get('/getPersonList', async (req, res, next) => {
     var query = 'SELECT * FROM persons';
