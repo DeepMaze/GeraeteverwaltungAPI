@@ -20,19 +20,30 @@ const createToken = (userID, ip) => {
 const verifyToken = (token, userID) => {
     if (!token || !userID) { return 0 };
     try {
-        var decoded = jwt.verify(token, tokenConfig.privateKey);
+        jwt.verify(token, tokenConfig.publicKey, { algorithm: 'RS256' });
     } catch (err) {
         throw err;
     }
-    console.log(token)
-    if (decoded.userID != userID) { return -1 };
     return 1;
 };
 
 const checkTokenMIDWARE = (req, res, next) => {
+    console.log("req.method: ", req.method);
+    console.log("req.query: ", req.query);
+    console.log("req.body.params: ", req.body.params);
+    var params = { token: '', userID: '' };
+    if (req.method == 'GET' || req.method == 'DELETE') {
+        params.token = req.query.token;
+        params.userID = req.query.userID;
+    } else if (req.method == 'POST' || req.method == 'PUT' || req.method == 'PATCH') {
+        params.token = req.body.params.token;
+        params.userID = req.body.params.userID;
+    }
+    console.log("params: ", params)
     try {
-        var tokenVerify = verifyToken(req.token, req.userID);
+        var tokenVerify = verifyToken(params.token, params.userID);
     } catch (err) {
+        console.log(err);
         if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
         res.status(500).end()
     }
@@ -43,6 +54,7 @@ const checkTokenMIDWARE = (req, res, next) => {
             break;
         }
         case 0: {
+            console.log('here')
             if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
             res.status(400).end();
             break;

@@ -6,8 +6,8 @@ var path = require('path');
 var generalConfig = {
     port: 3000,
     environment: 'dev',
-    get debug() { return (generalConfig.environment == "dev") ? (true) : (false) },
-    get log() { return (generalConfig.environment == "prod") ? (true) : (false) },
+    debug: true,
+    log: false,
     logPath: './log/',
     logMaxAge: 7,
     clearOldLogsInterval: 24,

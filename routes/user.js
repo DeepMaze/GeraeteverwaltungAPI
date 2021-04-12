@@ -40,16 +40,12 @@ router.get('/getUser', async (req, res, next) => {
 });
 
 router.get('/createUser', async (req, res, next) => {
-    console.log("req.query: ", req.query);
     if (!req.query) {
-        console.log("IF: no query keys");
         res.status(400).send({ success: false });
-        // res.status(400).send({ success: false, error: errorMsg.dbConnectionFailure });
         return;
     }
     var query = 'INSERT INTO users (UserName, PassWord_Encrypted)' +
         `VALUES (${mysql.escape(req.query['userName'])}, '${await encrypt(mysql.escape(req.query['passWord']))}')`;
-    console.log(query);
     try {
         var connection = await mysql.createConnection(mysqlConfig);
         await connection.execute(query);
@@ -57,7 +53,6 @@ router.get('/createUser', async (req, res, next) => {
     } catch (err) {
         if (generalConfig.debug) { console.log('[ERROR]: ', err); }
         res.status(500).send({ success: false });
-        // res.status(500).send({ error: errorMsg.dbConnectionFailure });
         return;
     }
     res.status(204).send({ success: true });

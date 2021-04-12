@@ -23,7 +23,7 @@ router.get('/login', async (req, res, next) => {
         var [rows] = await connection.execute(query);
         connection.end();
     } catch (err) {
-        console.log(err);
+        if (generalConfig.debug) {console.log(err);}
         if (generalConfig.log) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: false }); }
         res.status(500).send({ error: messages.dbConnectionFailure });
     }
@@ -34,7 +34,7 @@ router.get('/login', async (req, res, next) => {
     try {
         var passWordResult = bcrypt.compare(req.query['passWord'], rows[0]['PassWord_Encrypted'])
     } catch (err) {
-        console.log(err);
+        if (generalConfig.debug) {console.log(err);}
         if (generalConfig.log) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: false }); }
         res.status(500).send({ error: messages.dbConnectionFailure });
     }
@@ -54,7 +54,7 @@ router.get('/login', async (req, res, next) => {
         res.status(500).send();
     }
     res.status(200).send(userData);
-});
+}); 
 
 router.get('/checkToken', async (req, res, next) => {
     var result = await checkToken()
