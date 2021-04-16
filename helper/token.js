@@ -8,7 +8,7 @@ var { generalConfig, tokenConfig } = require('../environment/config');
 
 const createToken = (userID, ip) => {
     try {
-        var token = jwt.sign({ userID }, tokenConfig.privateKey, { algorithm: 'RS256', expiresIn: tokenConfig.expireIn });
+        var token = jwt.sign({ userID }, tokenConfig.privateKey, { algorithm: 'RS256' });
     } catch (err) {
         if (generalConfig.debug) { console.log('[ERROR]: ', err); }
         throw err;
@@ -28,9 +28,6 @@ const verifyToken = (token, userID) => {
 };
 
 const checkTokenMIDWARE = (req, res, next) => {
-    console.log("req.method: ", req.method);
-    console.log("req.query: ", req.query);
-    console.log("req.body.params: ", req.body.params);
     var params = { token: '', userID: '' };
     if (req.method == 'GET' || req.method == 'DELETE') {
         params.token = req.query.token;
@@ -39,20 +36,14 @@ const checkTokenMIDWARE = (req, res, next) => {
         params.token = req.body.params.token;
         params.userID = req.body.params.userID;
     }
-    console.log("params: ", params)
     try {
         var tokenVerify = verifyToken(params.token, params.userID);
     } catch (err) {
         console.log(err);
         if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
-        res.status(500).end()
+        res.status(500).end('Token is invalid!');
     }
     switch (tokenVerify) {
-        case -1: {
-            if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
-            res.status(200).end();
-            break;
-        }
         case 0: {
             console.log('here')
             if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
