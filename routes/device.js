@@ -1,10 +1,10 @@
 var express = require('express');
 var mysql = require('mysql2/promise');
 
+var queryDB = require('../helper/queryDB');
 var { checkTokenMIDWARE } = require('../helper/token');
 var buildUpdateSetString = require('../helper/buildUpdateSetString');
-var { mysqlConfig, generalConfig } = require('../environment/config');
-var errorMsg = require('../environment/messages');
+var { generalConfig } = require('../environment/config');
 
 
 
@@ -15,12 +15,10 @@ router.use('/*', checkTokenMIDWARE);
 router.get('/getDeviceList', async (req, res, next) => {
     var query = 'SELECT ID, Label, DescriptiveInformation, SerialNumber, Manufacturer, Model, RentStart, ExpectedReturn, LocationID, PersonID FROM devices';
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        var [rows] = await connection.execute(query);
-        connection.end();
+        var [rows] = await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
-        res.status(500).send({ error: errorMsg.dbConnectionFailure });
+        res.status(500).send();
     }
     res.status(200).send(rows);
 });
@@ -29,12 +27,10 @@ router.get('/getDevice', async (req, res, next) => {
     if (!req.query) { req.status(400).send() }
     var query = `SELECT ID, Label, DescriptiveInformation, SerialNumber, Manufacturer, Model, RentStart, ExpectedReturn, LocationID, PersonID FROM devices WHERE ${mysql.escape(req.query['data']['deviceID'])}`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        var [rows] = await connection.execute(query);
-        connection.end();
+        var [rows] = await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
-        res.status(500).send({ error: errorMsg.dbConnectionFailure });
+        res.status(500).send();
     }
     res.status(200).send(rows);
 });
@@ -62,16 +58,12 @@ router.get('/getDeviceID', async (req, res, next) => {
         `ExpectedReturn ${device['ExpectedReturn']} AND ` +
         `LocationID = ${mysql.escape(device['LocationID'])} AND ` +
         `PersonID = ${mysql.escape(device['PersonID'])}`;
-    console.log(query);
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        var [rows] = await connection.execute(query);
-        connection.end();
+        var [rows] = await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
-        res.status(500).send({ error: errorMsg.dbConnectionFailure });
+        res.status(500).send();
     }
-    console.log("rows: ", rows);
     res.status(200).send(rows[0]);
 });
 
@@ -84,12 +76,10 @@ router.post('/createDevice', async (req, res, next) => {
         `${mysql.escape(device['Manufacturer'])}, ${mysql.escape(device['Model'])}, ${mysql.escape(device['RentStart'])}, ` +
         `${mysql.escape(device['ExpectedReturn'])}, ${mysql.escape(device['LocationID'])}, ${mysql.escape(device['PersonID'])})`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        await connection.execute(query);
-        connection.end();
+        await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
-        res.status(500).send({ error: errorMsg.dbConnectionFailure });
+        res.status(500).send();
     }
     res.status(204).send();
 });
@@ -98,9 +88,7 @@ router.patch('/updateDevice', async (req, res, next) => {
     var device = JSON.parse(req.body.params['device']);
     var query = `UPDATE devices SET ${buildUpdateSetString(device)} WHERE ID = ${mysql.escape(device.ID)}`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        await connection.execute(query);
-        connection.end();
+        await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
         res.status(500).send();
@@ -112,12 +100,10 @@ router.delete('/deleteDevice', async (req, res, next) => {
     var query = `DELETE FROM devices WHERE ID = ${mysql.escape(parseInt(req.query['deviceID']))}`;
     console.log(query);
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        await connection.execute(query);
-        connection.end();
+        await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
-        res.status(500).send({ error: errorMsg.dbConnectionFailure });
+        res.status(500).send();
     }
     res.status(204).send();
 });

@@ -1,10 +1,10 @@
 var express = require('express');
 var mysql = require('mysql2/promise');
 
+var queryDB = require('../helper/queryDB');
 var { checkTokenMIDWARE } = require('../helper/token');
 var buildUpdateSetString = require('../helper/buildUpdateSetString');
-var { mysqlConfig } = require('../environment/config');
-var errorMsg = require('../environment/messages');
+var { generalConfig } = require('../environment/config');
 
 
 
@@ -15,9 +15,7 @@ router.use('/*', checkTokenMIDWARE);
 router.get('/getLocationList', async (req, res, next) => {
     var query = 'SELECT ID, Label, DescriptiveInformation, Postalcode, City, Street FROM locations';
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        var [rows] = await connection.execute(query);
-        connection.end();
+        var [rows] = await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
         res.status(500).send();
@@ -28,12 +26,10 @@ router.get('/getLocationList', async (req, res, next) => {
 router.get('/getLocation', async (req, res, next) => {
     var query = `SELECT ID, Label, DescriptiveInformation, Postalcode, City, Street FROM locations WHERE ${mysql.escape(req.query['data']['locationID'])}`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        var [rows] = await connection.execute(query);
-        connection.end();
+        var [rows] = await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
-        res.status(500).send({ error: errorMsg.dbConnectionFailure });
+        res.status(500).send();
     }
     res.status(200).send(rows);
 });
@@ -47,9 +43,7 @@ router.get('/getLocationID', async (req, res, next) => {
         `City = ${mysql.escape(location['City'])} AND ` +
         `Street ${location['Street']}`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        var [rows] = await connection.execute(query);
-        connection.end();
+        var [rows] = await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
         res.status(500).send();
@@ -63,9 +57,7 @@ router.post('/createLocation', async (req, res, next) => {
         `VALUES (${mysql.escape(location['Label'])}, ${mysql.escape(location['DescriptiveInformation'])}, ${mysql.escape(location['Postalcode'])}, ` +
         `${mysql.escape(location['City'])}, ${mysql.escape(location['Street'])})`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        await connection.execute(query);
-        connection.end();
+        await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
         res.status(500).send();
@@ -77,9 +69,7 @@ router.patch('/updatelocation', async (req, res, next) => {
     var location = JSON.parse(req.body.params['location']);
     var query = `UPDATE locations SET ${buildUpdateSetString(location)} WHERE ID = ${mysql.escape(location.ID)}`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        await connection.execute(query);
-        connection.end();
+        await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
         res.status(500).send();
@@ -90,9 +80,7 @@ router.patch('/updatelocation', async (req, res, next) => {
 router.delete('/deleteLocation', async (req, res, next) => {
     var query = `DELETE FROM locations WHERE ID = ${mysql.escape(parseInt(req.query['locationID']))}`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        await connection.execute(query);
-        connection.end();
+        await queryDB(query);
     } catch (err) {
         if (generalConfig.debug) { console.error(err); }
         res.status(500).send();

@@ -2,11 +2,10 @@ var express = require('express');
 var mysql = require('mysql2/promise');
 var bcrypt = require('bcrypt');
 
+var queryDB = require('../helper/queryDB');
 var { createLog } = require('../helper/logging');
-var { createToken, checkTokenMIDWARE } = require('../helper/token');
-var { generalConfig, mysqlConfig } = require('../environment/config');
-var messages = require('../environment/messages');
-const { JsonWebTokenError } = require('jsonwebtoken');
+var { createToken } = require('../helper/token');
+var { generalConfig } = require('../environment/config');
 
 
 
@@ -19,13 +18,11 @@ router.get('/login', async (req, res, next) => {
     }
     var query = `SELECT ID, PassWord_Encrypted FROM users WHERE UserName = ${mysql.escape(req.query['userName'])}`;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
-        var [rows] = await connection.execute(query);
-        connection.end();
+        var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) {console.log(err);}
+        if (generalConfig.debug) { console.log(err); }
         if (generalConfig.log) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: false }); }
-        res.status(500).send({ error: messages.dbConnectionFailure });
+        res.status(500).send();
     }
     if (!rows || rows.length == 0) {
         res.status(200).send({ userData: null });
@@ -34,9 +31,9 @@ router.get('/login', async (req, res, next) => {
     try {
         var passWordResult = bcrypt.compare(req.query['passWord'], rows[0]['PassWord_Encrypted'])
     } catch (err) {
-        if (generalConfig.debug) {console.log(err);}
+        if (generalConfig.debug) { console.log(err); }
         if (generalConfig.log) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: false }); }
-        res.status(500).send({ error: messages.dbConnectionFailure });
+        res.status(500).send();
     }
     if (generalConfig.log) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: passWordResult }); }
     if (!passWordResult) {
@@ -48,16 +45,11 @@ router.get('/login', async (req, res, next) => {
             userName: req.query['userName'],
             token: createToken(rows[0]?.userID)
         };
-        console.log("userData.userID: ", userData.userID)
     } catch (err) {
         if (generalConfig.debug) { console.log("[ERROR]: ", err); }
         res.status(500).send();
     }
     res.status(200).send(userData);
-}); 
-
-router.get('/checkToken', async (req, res, next) => {
-    var result = await checkToken()
 });
 
 

@@ -5,7 +5,7 @@ var logger = require('morgan');
 var path = require('path');
 
 var { createLog } = require('./helper/logging');
-var checkConfig = require('./helper/checkConfig');
+var prepareDB = require('./helper/prepareDB');
 var { generalConfig } = require('./environment/config');
 var routes = require('./environment/routes');
 
@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-checkConfig()
+prepareDB()
 
 routes.forEach(route => {
     app.use(route.path, require(route.file));
