@@ -15,7 +15,7 @@ const checkConfig = async () => {
         var query = `INSERT INTO config (Config_Key, Config_Value) VALUES ('enableGuestLogin', FALSE), ('enableAccountCreation', TRUE), ('enableGuestDataManipulation', FALSE)`;
         try {
             var connection = await mysql.createConnection(mysqlConfig);
-            await connection.execute(selectQuery);
+            await connection.execute(query);
             connection.end();
         } catch (err) {
             if (generalConfig.debug) { console.error(err); }
