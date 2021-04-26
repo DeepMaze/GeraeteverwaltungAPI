@@ -2,11 +2,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var fs = require('fs');
 var path = require('path');
 
 var { createLog } = require('./helper/logging');
-var { generalConfig, tokenConfig } = require('./environment/config');
+var checkConfig = require('./helper/checkConfig');
+var { generalConfig } = require('./environment/config');
 var routes = require('./environment/routes');
 
 
@@ -21,6 +21,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+checkConfig()
 
 routes.forEach(route => {
     app.use(route.path, require(route.file));

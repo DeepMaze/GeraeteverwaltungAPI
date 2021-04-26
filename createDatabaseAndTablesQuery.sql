@@ -44,3 +44,11 @@ CREATE TABLE Users (
 	Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (ID)
 );
+
+CREATE Table Config (
+    ID int NOT NULL AUTO_INCREMENT,
+    Config_Key varchar(255) NOT NULL,
+    Config_Value varchar(255) NOT NULL,
+	Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID)
+);
