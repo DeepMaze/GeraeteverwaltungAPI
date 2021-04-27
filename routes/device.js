@@ -17,7 +17,7 @@ router.get('/getDeviceList', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -29,7 +29,7 @@ router.get('/getDevice', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -37,7 +37,6 @@ router.get('/getDevice', async (req, res, next) => {
 
 router.get('/getDeviceID', async (req, res, next) => {
     if (!req.query) { req.status(400).send() }
-    console.log('req.query.device: ', req.query.device);
     var device = JSON.parse(req.query.device);
     if (device.RentStart == '') {
         device.RentStart = 'IS NULL';
@@ -61,7 +60,7 @@ router.get('/getDeviceID', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows[0]);
@@ -78,7 +77,7 @@ router.post('/createDevice', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -90,7 +89,7 @@ router.patch('/updateDevice', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -98,11 +97,10 @@ router.patch('/updateDevice', async (req, res, next) => {
 
 router.delete('/deleteDevice', async (req, res, next) => {
     var query = `DELETE FROM devices WHERE ID = ${mysql.escape(parseInt(req.query['deviceID']))}`;
-    console.log(query);
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();

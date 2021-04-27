@@ -15,7 +15,7 @@ router.get('/getConfig', async (req, res, next) => {
         var [rows] = await connection.execute(query);
         connection.end();
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -32,7 +32,7 @@ router.post('/updateConfig', checkTokenMIDWARE, async (req, res, next) => {
         })
         connection.end();
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();

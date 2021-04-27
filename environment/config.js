@@ -5,12 +5,13 @@ var path = require('path');
 
 var generalConfig = {
     port: 3000,
-    environment: 'dev',
     debug: true,
-    log: false,
+    createLogs: false,
     logPath: './log/',
     logMaxAge: 7,
     clearOldLogsInterval: 24,
+    createAndFillBasicDB: true,
+    sqlQuerys: fs.readFileSync(path.resolve('createDatabaseAndTablesQuery.sql'), 'utf8').split(';')
 };
 
 var mysqlConfig = {

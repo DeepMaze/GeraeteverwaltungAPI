@@ -22,11 +22,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-prepareDB()
+if (generalConfig.createAndFillBasicDB) {
+    prepareDB();
+}
 
 routes.forEach(route => {
     app.use(route.path, require(route.file));
-    if (generalConfig.log) { createLog({ type: 'routeSetup', params: { port } }); }
+    if (generalConfig.createLogs) { createLog({ type: 'routeSetup', params: { port } }); }
 });
 
 module.exports = app;

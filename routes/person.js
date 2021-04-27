@@ -17,7 +17,7 @@ router.get('/getPersonList', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -28,7 +28,7 @@ router.get('/getPerson', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -43,7 +43,7 @@ router.get('/getPersonID', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows[0]);
@@ -56,7 +56,7 @@ router.post('/createPerson', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -68,7 +68,7 @@ router.patch('/updatePerson', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -79,7 +79,7 @@ router.delete('/deletePerson', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();

@@ -10,10 +10,10 @@ const createToken = (userID, ip) => {
     try {
         var token = jwt.sign({ userID }, tokenConfig.privateKey, { algorithm: 'RS256' });
     } catch (err) {
-        if (generalConfig.debug) { console.log('[ERROR]: ', err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         throw err;
     }
-    if (generalConfig.log) { createLog({ type: 'tokenCreated', params: { userID, ip } }); }
+    if (generalConfig.createLogs) { createLog({ type: 'tokenCreated', params: { userID, ip } }); }
     return token;
 };
 
@@ -39,19 +39,18 @@ const checkTokenMIDWARE = (req, res, next) => {
     try {
         var tokenVerify = verifyToken(params.token, params.userID);
     } catch (err) {
-        console.log(err);
-        if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
-        res.status(500).end('Token is invalid!');
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (generalConfig.createLogs) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
+        res.status(500).end();
     }
     switch (tokenVerify) {
         case 0: {
-            console.log('here')
-            if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
+            if (generalConfig.createLogs) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
             res.status(400).end();
             break;
         }
         case 1: {
-            if (generalConfig.log) { createLog({ type: 'tokenChecked', params: { userID, result: true } }); }
+            if (generalConfig.createLogs) { createLog({ type: 'tokenChecked', params: { userID, result: true } }); }
             next();
             break;
         }

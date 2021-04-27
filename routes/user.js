@@ -29,7 +29,7 @@ router.get('/getUser', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.log('[ERROR]: ', err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -45,7 +45,7 @@ router.get('/createUser', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.log('[ERROR]: ', err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send({ success: false });
         return;
     }

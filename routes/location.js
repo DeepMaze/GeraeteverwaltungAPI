@@ -17,7 +17,7 @@ router.get('/getLocationList', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -28,7 +28,7 @@ router.get('/getLocation', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -45,7 +45,7 @@ router.get('/getLocationID', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows[0]);
@@ -59,7 +59,7 @@ router.post('/createLocation', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -71,7 +71,7 @@ router.patch('/updatelocation', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -82,7 +82,7 @@ router.delete('/deleteLocation', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();

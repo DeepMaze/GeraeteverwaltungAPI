@@ -1,10 +1,3 @@
-const debugMessages = {
-    dbConnectionFailure: 'Something went wrong when trying to connect to the database.',
-    invalidToken: 'The token supplied is not valid.',
-    missingData: 'Some data is missing.',
-    loginFailed: 'Wrong password.',
-    loginSuccessful: 'You are now logged in.'
-}
 
 const logMessages = {
     serverStart: (params) => { return { type: 'info', msg: `Server started, listening on ${params.port}` }; },
@@ -14,4 +7,5 @@ const logMessages = {
     loginChecked: (params) => { return { type: 'info', msg: `IP-Address ${params.ip} ${(params.result) ? ('logged in') : ('failed to login')} with user '${params.userID}'` }; },
 };
 
-module.exports = { debugMessages, logMessages };
+
+module.exports = logMessages;

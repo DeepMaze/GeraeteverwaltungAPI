@@ -1,55 +1,55 @@
 var { constants } = require('fs');
 var { access, writeFile, readdir, stat, rm } = require('fs/promises');
 
-var { globalConfig } = require('../environment/config');
-var { logMessage } = require('../environment/messages');
+var { generalConfig } = require('../environment/config');
+var logMessage = require('../environment/messages');
 
 
 
 const createLog = async (type, status, params) => {
     var currDate = new Date(Date.now());
     var pathDate = `${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate()}`;
-    var filePath = `${globalConfig.logPath}/${type}/${pathDate}.txt`;
+    var filePath = `${generalConfig.createLogsPath}/${type}/${pathDate}.txt`;
     try {
         var err = await access(filePath, constants.F_OK | constants.W_OK);
         if (err) {
-            if (globalConfig.debug) { console.log(err); }
+            if (generalConfig.debug) { console.error('[ERROR]: ', err); }
             return;
         }
         var message = `${currDate.getHours}:${currDate.getMinutes}:${currDate.getSeconds}.${currDate.getMilliseconds}\t${logMessage[status](params)}`;
         var err = await writeFile(filePath, message);
         if (err) {
-            if (globalConfig.debug) { console.log(err); }
+            if (generalConfig.debug) { console.error('[ERROR]: ', err); }
             return;
         }
     } catch (err) {
-        if (globalConfig.debug) { console.log(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
     }
 };
 
 const handleOldLogs = async () => {
     try {
-        var err = await access(globalConfig.logPath, constants.F_OK | constants.W_OK);
+        var err = await access(generalConfig.createLogsPath, constants.F_OK | constants.W_OK);
         if (err) {
-            if (globalConfig.debug) { console.log(err); }
+            if (generalConfig.debug) { console.error('[ERROR]: ', err); }
             return;
         }
         var filesToDelete = [];
-        var folderContent = await readdir(globalConfig.logPath);
+        var folderContent = await readdir(generalConfig.createLogsPath);
         for (var folder of folderContent) {
-            var files = await readdir(`${globalConfig.logPath}/${folder}`);
+            var files = await readdir(`${generalConfig.createLogsPath}/${folder}`);
             for (var file of files) {
-                var fileInfo = await stat(`${globalConfig.logPath}/${folder}/${file}`);
+                var fileInfo = await stat(`${generalConfig.createLogsPath}/${folder}/${file}`);
                 var fileCreationDate = new Date(fileInfo.birthtime);
                 var timeDifference = Date.now().getMilliseconds() - fileCreationDate.getMilliseconds();
-                if (timeDifference > 1000 * 60 * 60 * 24 * globalConfig.logMaxAge) {
-                    filesToDelete.append(`${globalConfig.logPath}/${folder}/${file}`);
+                if (timeDifference > 1000 * 60 * 60 * 24 * generalConfig.createLogsMaxAge) {
+                    filesToDelete.append(`${generalConfig.createLogsPath}/${folder}/${file}`);
                 }
             }
         }
         for (file of filesToDelete) { rm(file); }
     } catch (err) {
-        if (globalConfig.debug) { console.log(err); }
+        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
     }
 }
 
