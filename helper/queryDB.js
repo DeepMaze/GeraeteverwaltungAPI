@@ -1,18 +1,26 @@
 var mysql = require('mysql2/promise');
 
-var { mysqlConfig } = require('../environment/config');
 
 
-
-const queryDB = async (query) => {
+const queryDB = async (query, connectionURI = {}) => {
+    if (Object.keys(connectionURI).length == 0) {
+        var connectionURI_TEMP = {
+            host: process.env.MYSQL_HOST,
+            user: process.env.MYSQL_USERNAME,
+            password: process.env.MYSQL_PASSWORD,
+            database: process.env.MYSQL_DATABASE
+        }
+        connectionURI = connectionURI_TEMP;
+    }
     var rows;
+    var connection;
     try {
-        var connection = await mysql.createConnection(mysqlConfig);
+        connection = await mysql.createConnection(connectionURI);
         rows = await connection.execute(query);
     } catch (err) {
         throw err;
     } finally {
-        connection.end();
+        connection?.end();
     }
     return rows;
 }

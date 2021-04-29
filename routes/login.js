@@ -3,9 +3,7 @@ var mysql = require('mysql2/promise');
 var bcrypt = require('bcrypt');
 
 var queryDB = require('../helper/queryDB');
-var { createLog } = require('../helper/logging');
 var { createToken } = require('../helper/token');
-var { generalConfig } = require('../environment/config');
 
 
 
@@ -20,8 +18,7 @@ router.get('/login', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
-        if (generalConfig.createLogs) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: false }); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     if (!rows || rows.length == 0) {
@@ -31,11 +28,9 @@ router.get('/login', async (req, res, next) => {
     try {
         var passWordResult = bcrypt.compare(req.query['passWord'], rows[0]['PassWord_Encrypted'])
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
-        if (generalConfig.createLogs) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: false }); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
-    if (generalConfig.createLogs) { createLog('loginChecked', null, { userID, ip: req.socket.remoteAddress, result: passWordResult }); }
     if (!passWordResult) {
         res.status(400).send({ userData: null });
     }
@@ -46,7 +41,7 @@ router.get('/login', async (req, res, next) => {
             token: createToken(rows[0]?.userID)
         };
     } catch (err) {
-        if (generalConfig.debug) { console.error("[ERROR]: ", err); }
+        if (process.env.DEBUG) { console.error("[ERROR]: ", err); }
         res.status(500).send();
     }
     res.status(200).send(userData);

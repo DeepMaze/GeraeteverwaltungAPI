@@ -1,26 +1,25 @@
+var fs = require('fs');
+var path = require('path');
 var jwt = require('jsonwebtoken');
 
-var { createLog } = require('./logging');
 
-var { generalConfig, tokenConfig } = require('../environment/config');
-
-
+const privateKey = fs.readFileSync(path.resolve('keys\\private.key'), 'utf8');
+const publicKey = fs.readFileSync(path.resolve('keys\\public.key'), 'utf8');
 
 const createToken = (userID, ip) => {
     try {
-        var token = jwt.sign({ userID }, tokenConfig.privateKey, { algorithm: 'RS256' });
+        var token = jwt.sign({ userID }, privateKey, { algorithm: 'RS256' });
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         throw err;
     }
-    if (generalConfig.createLogs) { createLog({ type: 'tokenCreated', params: { userID, ip } }); }
     return token;
 };
 
 const verifyToken = (token, userID) => {
     if (!token || !userID) { return 0 };
     try {
-        jwt.verify(token, tokenConfig.publicKey, { algorithm: 'RS256' });
+        jwt.verify(token, publicKey, { algorithm: 'RS256' });
     } catch (err) {
         throw err;
     }
@@ -39,18 +38,15 @@ const checkTokenMIDWARE = (req, res, next) => {
     try {
         var tokenVerify = verifyToken(params.token, params.userID);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
-        if (generalConfig.createLogs) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).end();
     }
     switch (tokenVerify) {
         case 0: {
-            if (generalConfig.createLogs) { createLog({ type: 'tokenChecked', params: { userID, result: false, ip: req.socket.remoteAddress } }); }
             res.status(400).end();
             break;
         }
         case 1: {
-            if (generalConfig.createLogs) { createLog({ type: 'tokenChecked', params: { userID, result: true } }); }
             next();
             break;
         }

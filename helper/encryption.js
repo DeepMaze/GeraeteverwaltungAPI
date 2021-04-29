@@ -1,11 +1,9 @@
 var bcrypt = require('bcrypt');
 
-var { encryptionConfig } = require('../environment/config');
-
 
 
 var encrypt = async (data) => {
-    return await bcrypt.hash(data, encryptionConfig.saltRounds)
+    return await bcrypt.hash(data, parseInt(process.env.TOKEN_SALTROUNDS));
 }
 
 module.exports = encrypt;

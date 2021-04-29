@@ -4,10 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var path = require('path');
 
-var { createLog } = require('./helper/logging');
 var prepareDB = require('./helper/prepareDB');
-var { generalConfig } = require('./environment/config');
-var routes = require('./environment/routes');
 
 
 
@@ -22,13 +19,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-if (generalConfig.createAndFillBasicDB) {
+if (process.env.SQL_PREPARE_DB) {
     prepareDB();
 }
 
+const routes = [
+    { path: '/config', file: './routes/config' },
+    { path: '/login', file: './routes/login' },
+    { path: '/device', file: './routes/device' },
+    { path: '/location', file: './routes/location' },
+    { path: '/person', file: './routes/person' },
+    { path: '/user', file: './routes/user' },
+];
+
 routes.forEach(route => {
     app.use(route.path, require(route.file));
-    if (generalConfig.createLogs) { createLog({ type: 'routeSetup', params: { port } }); }
 });
 
 module.exports = app;

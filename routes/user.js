@@ -2,10 +2,8 @@ var express = require('express');
 var mysql = require('mysql2/promise');
 
 var queryDB = require('../helper/queryDB');
-var { checkTokenMIDWARE } = require('../helper/token');
 var encrypt = require('../helper/encryption');
 var buildUpdateSetString = require('../helper/buildUpdateSetString');
-var { generalConfig } = require('../environment/config');
 
 
 
@@ -24,28 +22,23 @@ router.get('/getUsersList', async (req, res, next) => {
 });
 
 router.get('/getUser', async (req, res, next) => {
-    if (!req.query['userID']) { req.status(400).send({ error: errorMsg.missingData }) }
     var query = `SELECT * FROM users WHERE ${mysql.escape(req.query['data']['userID'])}`;
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
 });
 
 router.get('/createUser', async (req, res, next) => {
-    if (!req.query) {
-        res.status(400).send({ success: false });
-        return;
-    }
     var query = 'INSERT INTO users (UserName, PassWord_Encrypted)' +
         `VALUES (${mysql.escape(req.query['userName'])}, '${await encrypt(mysql.escape(req.query['passWord']))}')`;
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send({ success: false });
         return;
     }
@@ -57,16 +50,21 @@ router.put('/updateUser', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
 });
 
-router.put('/deleteUser', async (req, res, next) => {
-    var query = `DELETE FROM users WHERE UserID = ${mysql.escape(req.query['userID'])}`;
+router.post('/deleteUser', async (req, res, next) => {
+    var query = `DELETE FROM users WHERE ID = ${mysql.escape(req.body.params['userID'])}`;
+    console.log("");
+    console.log(query);
+    console.log("");
     try {
         await queryDB(query);
     } catch (err) {
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();

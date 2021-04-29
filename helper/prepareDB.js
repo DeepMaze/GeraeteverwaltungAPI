@@ -1,17 +1,22 @@
 var mysql = require('mysql2/promise');
+var fs = require('fs');
+var path = require('path');
 
 var encrypt = require('./encryption');
 var queryDB = require('./queryDB');
-var { mysqlConfig, generalConfig } = require('../environment/config');
 
-var sqls = {
-    db: generalConfig.sqlQuerys[0],
-    config: generalConfig.sqlQuerys[1],
-    users: generalConfig.sqlQuerys[2],
-    devices: generalConfig.sqlQuerys[3],
-    locations: generalConfig.sqlQuerys[4],
-    persons: generalConfig.sqlQuerys[5]
-}
+
+
+const DB_QUERY_COMPLETE_ARRAY = fs.readFileSync(path.resolve('createDatabaseAndTablesQuery.sql'), 'utf8').split(';');
+
+const DB_QUERY_SPLIT = {
+    db: DB_QUERY_COMPLETE_ARRAY[0],
+    config: DB_QUERY_COMPLETE_ARRAY[1],
+    users: DB_QUERY_COMPLETE_ARRAY[2],
+    devices: DB_QUERY_COMPLETE_ARRAY[3],
+    locations: DB_QUERY_COMPLETE_ARRAY[4],
+    persons: DB_QUERY_COMPLETE_ARRAY[5]
+};
 
 const prepareDB = async () => {
     await checkAndCreateDatabase();
@@ -22,35 +27,32 @@ const prepareDB = async () => {
 
 const checkAndCreateDatabase = async () => {
     var connectionURI = {
-        host: mysqlConfig.host,
-        user: mysqlConfig.user,
-        password: mysqlConfig.password,
+        host: process.env.MYSQL_HOST,
+        user: process.env.MYSQL_USERNAME,
+        password: process.env.MYSQL_PASSWORD,
     }
-    var query = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ${mysql.escape(mysqlConfig.database)}`;
+    var query = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ${mysql.escape(process.env.MYSQL_DATABASE)}`;
     try {
-        var connection = await mysql.createConnection(connectionURI);
-        var [rows] = await connection.execute(query);
+        var [rows] = await queryDB(query, connectionURI);
         if (rows.length == 0) {
-            [rows] = await connection.execute(sqls.db);
+            [rows] = await queryDB(DB_QUERY_SPLIT.db, connectionURI);
         }
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
-    } finally {
-        connection.end();
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
     }
 };
 
 const checkAndCreateTables = async () => {
-    for (table in sqls) {
+    for (table in DB_QUERY_SPLIT) {
         if (table == 'db') { continue; }
         var query = `SHOW TABLES LIKE '${table}'`;
         try {
             var [rows] = await queryDB(query);
             if (rows.length == 0) {
-                [rows] = await queryDB(sqls[table]);
+                [rows] = await queryDB(DB_QUERY_SPLIT[table]);
             }
         } catch (err) {
-            if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+            if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         }
     }
 }
@@ -64,7 +66,7 @@ const checkConfig = async () => {
             [rows] = await queryDB(insertQuery);
         }
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (process.env.DEBUG) { console.error(err); }
     }
 }
 
@@ -73,7 +75,7 @@ const checkUsers = async () => {
     try {
         var [rows] = await queryDB(selectQuery);
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (process.env.DEBUG) { console.error(err); }
     }
     var adminUser = rows.find(value => { return value['UserName'] == 'Admin'; });
     var guestUser = rows.find(value => { return value['UserName'] == 'Guest'; });
@@ -87,7 +89,7 @@ const checkUsers = async () => {
             await queryDB(insertQuery);
         }
     } catch (err) {
-        if (generalConfig.debug) { console.error(err); }
+        if (process.env.DEBUG) { console.error(err); }
     }
 }
 

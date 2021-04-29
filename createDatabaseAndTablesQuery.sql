@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS Config (
     Config_Key VARCHAR(255) NOT NULL, 
     Config_Value BOOLEAN NOT NULL, 
     Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-    PRIMARY KEY (ID)
+    PRIMARY KEY (ID, Config_Key)
 );
 
 CREATE TABLE IF NOT EXISTS Users (
@@ -23,8 +23,6 @@ CREATE TABLE IF NOT EXISTS Devices (
     SerialNumber varchar(255),
     Manufacturer varchar(255),
     Model varchar(255),
-    RentStart DATE,
-    ExpectedReturn DATE,
     LocationID int,
     PersonID int,
     Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -4,7 +4,6 @@ var mysql = require('mysql2/promise');
 var queryDB = require('../helper/queryDB');
 var { checkTokenMIDWARE } = require('../helper/token');
 var buildUpdateSetString = require('../helper/buildUpdateSetString');
-var { generalConfig } = require('../environment/config');
 
 
 
@@ -17,7 +16,7 @@ router.get('/getLocationList', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -28,7 +27,7 @@ router.get('/getLocation', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -41,25 +40,33 @@ router.get('/getLocationID', async (req, res, next) => {
         `DescriptiveInformation = ${mysql.escape(location['DescriptiveInformation'])} AND ` +
         `Postalcode = ${mysql.escape(location['Postalcode'])} AND ` +
         `City = ${mysql.escape(location['City'])} AND ` +
-        `Street ${location['Street']}`;
-    try {
+        `Street = ${mysql.escape(location['Street'])};`;
+        console.log("");
+        console.log(query);
+        console.log("");
+        try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
+    console.log("rows.length: ", rows.length)
+    console.log("rows: ", rows)
     res.status(200).send(rows[0]);
 });
 
 router.post('/createLocation', async (req, res, next) => {
     var location = JSON.parse(req.body.params['location']);
-    var query = 'INSERT INTO locations (Label, DescriptiveInformation, Postalcode, City, Street) ' +
-        `VALUES (${mysql.escape(location['Label'])}, ${mysql.escape(location['DescriptiveInformation'])}, ${mysql.escape(location['Postalcode'])}, ` +
-        `${mysql.escape(location['City'])}, ${mysql.escape(location['Street'])})`;
+    var query = `INSERT INTO locations (Label, DescriptiveInformation, Postalcode, City, Street) VALUES (` +
+        `${mysql.escape(location['Label'])}, ` +
+        `${mysql.escape(location['DescriptiveInformation'])}, ` +
+        `${mysql.escape(location['Postalcode'])}, ` +
+        `${mysql.escape(location['City'])}, ` +
+        `${mysql.escape(location['Street'])})`;
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -71,7 +78,7 @@ router.patch('/updatelocation', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -82,7 +89,7 @@ router.delete('/deleteLocation', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();

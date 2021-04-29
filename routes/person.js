@@ -4,7 +4,6 @@ var mysql = require('mysql2/promise');
 var queryDB = require('../helper/queryDB');
 var { checkTokenMIDWARE } = require('../helper/token');
 var buildUpdateSetString = require('../helper/buildUpdateSetString');
-var { generalConfig } = require('../environment/config');
 
 
 
@@ -17,7 +16,7 @@ router.get('/getPersonList', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -28,7 +27,7 @@ router.get('/getPerson', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows);
@@ -43,7 +42,7 @@ router.get('/getPersonID', async (req, res, next) => {
     try {
         var [rows] = await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(200).send(rows[0]);
@@ -51,12 +50,14 @@ router.get('/getPersonID', async (req, res, next) => {
 
 router.post('/createPerson', async (req, res, next) => {
     var person = JSON.parse(req.body.params['person']);
-    var query = 'INSERT INTO persons (FirstName, LastName, Company) ' +
-        `VALUES (${mysql.escape(person['FirstName'])}, ${mysql.escape(person['LastName'])}, ${mysql.escape(person['Company'])})`;
+    var query = `INSERT INTO persons (FirstName, LastName, Company) VALUES (` +
+    `${mysql.escape(person['FirstName'])}, ` +
+    `${mysql.escape(person['LastName'])}, ` +
+    `${mysql.escape(person['Company'])})`;
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -68,7 +69,7 @@ router.patch('/updatePerson', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
@@ -79,7 +80,7 @@ router.delete('/deletePerson', async (req, res, next) => {
     try {
         await queryDB(query);
     } catch (err) {
-        if (generalConfig.debug) { console.error('[ERROR]: ', err); }
+        if (process.env.DEBUG) { console.error('[ERROR]: ', err); }
         res.status(500).send();
     }
     res.status(204).send();
